@@ -26,6 +26,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -44,8 +48,12 @@ import com.example.diagnose_app.utils.NotificationCard
 
 @Composable
 fun PatientHomePage(){
+    // State để điều khiển việc hiển thị BookingScreen
+    var isBookingSelected by remember { mutableStateOf(false) }
+
+    // Column của trang chính
     Column(
-    modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize()
     ) {
         Spacer(modifier = Modifier.height(20.dp))
         LazyColumn(
@@ -59,7 +67,7 @@ fun PatientHomePage(){
                 Spacer(modifier = Modifier.height(16.dp))
                 NotificationCard()
                 Spacer(modifier = Modifier.height(16.dp))
-                GridButtons()
+                GridButtons(onBookingClick = { isBookingSelected = true }) // Gọi callback khi nhấn nút Đặt lịch
             }
 
             item {
@@ -67,7 +75,26 @@ fun PatientHomePage(){
                 HistorySection()
             }
         }
+
+        // BottomNavBar luôn hiển thị phía dưới màn hình
         BottomNavBar()
+    }
+
+    // Khi isBookingSelected là true, hiển thị BookingScreen với background mờ
+    if (isBookingSelected) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            // Màn hình chính sẽ có background mờ 30%
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color(0x4D000000)) // 30% opacity (0x4D)
+            ) {
+                // Hiển thị BookingScreen
+                BookingScreen(
+                    onDismiss = { isBookingSelected = false } // Callback để đóng màn hình BookingScreen
+                )
+            }
+        }
     }
 }
 
@@ -175,9 +202,8 @@ fun HistorySection() {
     }
 }
 
-
 @Composable
-fun GridButtons() {
+fun GridButtons(onBookingClick: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -185,21 +211,22 @@ fun GridButtons() {
             horizontalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier.fillMaxWidth()
         ) {
-            HomeButton(icon = R.drawable.list, label = "Đặt lịch")
-            HomeButton(icon = R.drawable.camera, label = "BHYT")
-            HomeButton(icon = R.drawable.resultt, label = "Tiêm chủng")
-            HomeButton(icon = R.drawable.note, label = "Thanh toán")
+            HomeButton(icon = R.drawable.list, label = "Đặt lịch", onClick = onBookingClick)
+            HomeButton(icon = R.drawable.camera, label = "BHYT", onClick = {})
+            HomeButton(icon = R.drawable.resultt, label = "Tiêm chủng", onClick = {})
+            HomeButton(icon = R.drawable.note, label = "Thanh toán", onClick = {})
         }
     }
 }
 
+
 @Composable
-fun HomeButton(icon: Int, label: String) {
+fun HomeButton(icon: Int, label: String, onClick: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .wrapContentSize()
-            .clickable { }
+            .clickable { onClick() }
     ) {
         Card(
             shape = CircleShape,
@@ -227,7 +254,6 @@ fun HomeButton(icon: Int, label: String) {
         )
     }
 }
-
 
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
