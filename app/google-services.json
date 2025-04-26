@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "842891202659",
+    "project_id": "diagnose-app-aa9c8",
+    "storage_bucket": "diagnose-app-aa9c8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:842891202659:android:2ed665bfb1a6b6bc22a856",
+        "android_client_info": {
+          "package_name": "com.example.diagnose_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCmuGHFMV9lnTJPVKta5fGERXgqONQQbq0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
