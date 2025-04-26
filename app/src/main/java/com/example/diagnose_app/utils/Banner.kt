@@ -35,7 +35,7 @@ fun Banner(
     text: String
 ) {
     Card(
-        shape = RoundedCornerShape(2.dp),
+        shape = RoundedCornerShape(1.dp),
         modifier = Modifier
             .fillMaxWidth()
             .padding(padding),
