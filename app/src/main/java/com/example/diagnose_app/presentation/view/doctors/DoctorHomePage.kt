@@ -1,5 +1,6 @@
 package com.example.diagnose_app.presentation.view.doctors
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -18,14 +19,45 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.diagnose_app.R
+import com.example.diagnose_app.presentation.viewmodel.account.AuthViewModel
+import com.example.diagnose_app.presentation.viewmodel.account.PhysicianViewModel
 import com.example.diagnose_app.utils.BottomNavBar
 import com.example.diagnose_app.utils.ButtonClick
 import com.example.diagnose_app.utils.HeaderSection
 import com.example.diagnose_app.utils.NotificationCard
 
 @Composable
-fun DoctorHomePage() {
+fun DoctorHomePage(
+    authViewModel: AuthViewModel,
+    navController: NavController,
+    physicianViewModel: PhysicianViewModel
+) {
+    val accountId by authViewModel.account.collectAsState()
+    var isDoctorRegistered by remember { mutableStateOf<Boolean?>(null) }
+
+    var showDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(accountId) {
+        accountId?.id?.let { id ->
+            physicianViewModel.fetchPhysicianByAccountId(id)
+        }
+    }
+
+    val physicianId by physicianViewModel.physicianId.collectAsState()
+
+    LaunchedEffect(physicianId) {
+        showDialog = (physicianId == null)
+    }
+
+    LaunchedEffect(physicianViewModel.physicianId.collectAsState().value) {
+        val currentPhysicianId = physicianViewModel.physicianId.value
+        Log.d("HomeScreen", "Current physicianId from ViewModel: $currentPhysicianId")
+
+        showDialog = (currentPhysicianId == null)
+    }
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -187,10 +219,4 @@ fun ShiftChip(day: String) {
             fontSize = 14.sp
         )
     }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun DoctorHomePagePreview() {
-    DoctorHomePage()
 }

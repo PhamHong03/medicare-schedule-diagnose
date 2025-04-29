@@ -10,13 +10,22 @@ import androidx.navigation.compose.rememberNavController
 import com.example.diagnose_app.presentation.view.Login
 import com.example.diagnose_app.presentation.view.Register
 import com.example.diagnose_app.presentation.view.doctors.DoctorHomePage
+import com.example.diagnose_app.presentation.view.doctors.InfoDoctor
 import com.example.diagnose_app.presentation.view.patients.PatientHomePage
 import com.example.diagnose_app.presentation.viewmodel.account.AuthViewModel
+import com.example.diagnose_app.presentation.viewmodel.account.EducationViewModel
+import com.example.diagnose_app.presentation.viewmodel.account.PhysicianViewModel
+import com.example.diagnose_app.presentation.viewmodel.account.RoomViewModel
+import com.example.diagnose_app.presentation.viewmodel.account.SpecializationViewModel
 
 @Composable
 fun AppNavigation(modifier: Modifier = Modifier) {
     val navController  = rememberNavController()
     val authViewModel: AuthViewModel = viewModel()
+    val specializationViewModel: SpecializationViewModel = viewModel()
+    val educationViewModel: EducationViewModel = viewModel()
+    val room: RoomViewModel = viewModel()
+    val physicianViewModel: PhysicianViewModel = viewModel()
     NavHost(navController = navController, startDestination = "login") {
         composable(route = "login") {
             Login(navController, authViewModel)
@@ -30,6 +39,16 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         }
         composable(route = "home-doctor") {
             DoctorHomePage()
+        }
+
+        composable(route = "info-doctor") {
+            InfoDoctor(
+                navController = navController,
+                specializationViewModel = specializationViewModel,
+                authViewModel = authViewModel,
+                educationViewModel = educationViewModel,
+                physicianViewModel = physicianViewModel
+            )
         }
 
         composable(route = "home-patient") {
