@@ -1,5 +1,6 @@
 package com.example.diagnose_app.di
 
+import com.example.diagnose_app.data.datasource.remote.ApiService
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -13,7 +14,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    private val BASE_URL = ""
+    private val BASE_URL = "http://192.168.1.5:5000"
 
     @Provides
     @Singleton
@@ -24,5 +25,9 @@ object NetworkModule {
             .client(OkHttpClient.Builder().build())
             .build()
     }
-
+    @Provides
+    @Singleton
+    fun provideApiService(retrofit: Retrofit): ApiService {
+        return retrofit.create(ApiService::class.java)
+    }
 }

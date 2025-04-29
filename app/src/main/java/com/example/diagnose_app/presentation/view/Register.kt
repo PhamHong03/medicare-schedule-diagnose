@@ -1,5 +1,6 @@
 package com.example.diagnose_app.presentation.view
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,15 +14,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,22 +37,54 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.example.diagnose_app.R
+import com.example.diagnose_app.domain.usecase.register.RegisterRequest
+import com.example.diagnose_app.presentation.viewmodel.account.AuthViewModel
 import com.example.diagnose_app.ui.theme.ButtonColor
 import com.example.diagnose_app.ui.theme.checkBoxSelected
 import com.example.diagnose_app.utils.Social
+import kotlinx.coroutines.delay
 
 @Composable
-fun Register() {
+fun Register(
+    navController: NavController,
+    viewModel: AuthViewModel = hiltViewModel(),
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var isPasswordVisible by remember { mutableStateOf(false) }
     var role by remember { mutableStateOf("") }
+
+    val authState by viewModel.authState.collectAsState()
+    val context = LocalContext.current
+    LaunchedEffect(authState) {
+        println("Auth State: $authState")
+        authState?.let { result ->
+            when {
+                result.isSuccess -> {
+                    println("Đăng ký thành công: ${result.getOrNull()}")
+                    Toast.makeText(context, result.getOrNull(), Toast.LENGTH_SHORT).show()
+                    delay(1000)
+                    navController.navigate("login"){
+                        popUpTo("sign-up") { inclusive = true }
+                    }
+                }
+                result.isFailure -> {
+                    println("Đăng ký thất bại: ${result.exceptionOrNull()?.message}")
+                    Toast.makeText(context, result.exceptionOrNull()?.message ?: "Đăng ký thất bại", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -86,13 +125,31 @@ fun Register() {
             onValueChange = { password = it },
             placeholder = { Text("********") },
             modifier = Modifier.fillMaxWidth(),
+            trailingIcon = {
+                Icon(
+                    imageVector = if (isPasswordVisible) Icons.Filled.Done else Icons.Filled.Lock,
+                    contentDescription = if (isPasswordVisible) "Ẩn mật khẩu" else "Hiển thị mật khẩu",
+                    modifier = Modifier.clickable { isPasswordVisible = !isPasswordVisible }
+                )
+            },
             visualTransformation = PasswordVisualTransformation(mask = '*'),
+//            isPasswordField = true,
+//            isPasswordVisible = isPasswordVisible,
             shape = RoundedCornerShape(12.dp)
         )
-        RoleSelection()
+        RoleSelection(role = role, onRoleSelected = { selectedRole ->
+            role = selectedRole
+        })
         Spacer(modifier = Modifier.height(24.dp))
         Button(
-            onClick = {},
+            onClick = {
+                val accountRequest = RegisterRequest(
+                    email = email,
+                    password = password,
+                    role = role
+                )
+                viewModel.registerAccount(accountRequest)
+            },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
@@ -100,7 +157,7 @@ fun Register() {
             shape = RoundedCornerShape(12.dp)
         ) {
             Text(
-                text = "Đăng nhập",
+                text = "Đăng ký",
                 color = Color.White,
                 fontWeight = FontWeight.Bold
             )
@@ -113,9 +170,9 @@ fun Register() {
         Social()
         Spacer(modifier = Modifier.height(24.dp))
         Row {
-            Text(text = "Bạn chưa có tài khoản? ")
+            Text(text = "Bạn đã có tài khoản? ")
             Text(
-                text = "Đăng ký",
+                text = "Đăng nhập",
                 color = Color.Blue,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.clickable {
@@ -127,10 +184,7 @@ fun Register() {
 }
 
 @Composable
-fun RoleSelection() {
-    var isUserChecked by remember { mutableStateOf(false) }
-    var isDoctorChecked by remember { mutableStateOf(false) }
-
+fun RoleSelection(role: String, onRoleSelected: (String) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -142,14 +196,12 @@ fun RoleSelection() {
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .weight(1f)
+                modifier = Modifier.weight(1f)
             ) {
                 Checkbox(
-                    checked = isDoctorChecked,
-                    onCheckedChange = { isChecked ->
-                        isDoctorChecked = isChecked
-                        if (isChecked) isUserChecked = false
+                    checked = role == "doctor",
+                    onCheckedChange = {
+                        if (it) onRoleSelected("doctor")
                     },
                     colors = CheckboxDefaults.colors(
                         checkedColor = checkBoxSelected,
@@ -160,14 +212,12 @@ fun RoleSelection() {
             }
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier
-                    .weight(1f)
+                modifier = Modifier.weight(1f)
             ) {
                 Checkbox(
-                    checked = isUserChecked,
-                    onCheckedChange = { isChecked ->
-                        isUserChecked = isChecked
-                        if (isChecked) isDoctorChecked = false
+                    checked = role == "patient",
+                    onCheckedChange = {
+                        if (it) onRoleSelected("patient")
                     },
                     colors = CheckboxDefaults.colors(
                         checkedColor = checkBoxSelected,
@@ -176,13 +226,6 @@ fun RoleSelection() {
                 )
                 Text(text = "Người dùng")
             }
-
         }
     }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-private fun RegisterPreview() {
-    Register()
 }
