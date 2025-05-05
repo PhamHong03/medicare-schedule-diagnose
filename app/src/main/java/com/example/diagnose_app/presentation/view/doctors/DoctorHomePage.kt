@@ -22,129 +22,146 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.diagnose_app.R
 import com.example.diagnose_app.presentation.viewmodel.account.AuthViewModel
+import com.example.diagnose_app.presentation.viewmodel.account.CategoryDiseaseViewModel
+import com.example.diagnose_app.presentation.viewmodel.account.DiseaseViewModel
 import com.example.diagnose_app.presentation.viewmodel.account.PhysicianViewModel
+import com.example.diagnose_app.presentation.viewmodel.account.RoomViewModel
 import com.example.diagnose_app.utils.BottomNavBar
 import com.example.diagnose_app.utils.ButtonClick
+import com.example.diagnose_app.utils.ConfirmSaveDialog
 import com.example.diagnose_app.utils.HeaderSection
 import com.example.diagnose_app.utils.NotificationCard
+import kotlinx.coroutines.delay
 
 @Composable
 fun DoctorHomePage(
     authViewModel: AuthViewModel,
     navController: NavController,
-    physicianViewModel: PhysicianViewModel
+    physicianViewModel: PhysicianViewModel,
+    categoryDiseaseViewModel: CategoryDiseaseViewModel,
+    diseaseViewModel: DiseaseViewModel,
+    roomViewModel: RoomViewModel
 ) {
     val accountId by authViewModel.account.collectAsState()
-    var isDoctorRegistered by remember { mutableStateOf<Boolean?>(null) }
+    val physicianId by physicianViewModel.physicianId.collectAsState()
 
-    var showDialog by remember { mutableStateOf(false) }
-
-    LaunchedEffect(accountId) {
+    LaunchedEffect(accountId, physicianId) {
         accountId?.id?.let { id ->
             physicianViewModel.fetchPhysicianByAccountId(id)
         }
-    }
 
-    val physicianId by physicianViewModel.physicianId.collectAsState()
+        delay(300) // Có thể thay bằng flag ViewModel nếu có
 
-    LaunchedEffect(physicianId) {
-        showDialog = (physicianId == null)
-    }
-
-    LaunchedEffect(physicianViewModel.physicianId.collectAsState().value) {
-        val currentPhysicianId = physicianViewModel.physicianId.value
-        Log.d("HomeScreen", "Current physicianId from ViewModel: $currentPhysicianId")
-
-        showDialog = (currentPhysicianId == null)
-    }
-
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Spacer(modifier = Modifier.height(20.dp))
-        // Nội dung cuộn
-        LazyColumn(
-            modifier = Modifier
-                .weight(1f) // Chiếm hết không gian còn lại
-                .padding(horizontal = 16.dp)
-        ) {
-            item {
-                Spacer(modifier = Modifier.height(20.dp))
-                HeaderSection()
-                Spacer(modifier = Modifier.height(16.dp))
-                NotificationCard()
-                Spacer(modifier = Modifier.height(16.dp))
-                GridButtons()
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "Lịch khám trong ngày",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-
-            items(3) {
-                AppointmentItem(name = "Ổn Dĩ Phạm", age = "20", time = "9:00 AM - 9:30 AM")
-            }
-
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(
-                    text = "Lịch trực ca đêm:",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Row {
-                    ShiftChip(day = "T2")
-                    ShiftChip(day = "T4")
-                    ShiftChip(day = "T5")
-                    ShiftChip(day = "T7")
-                }
-                Spacer(modifier = Modifier.height(16.dp))
+        if (physicianId == null) {
+            navController.navigate("info-doctor") {
+                popUpTo("home-doctor") { inclusive = true }
             }
         }
+    }
+ LaunchedEffect(Unit) {
+     categoryDiseaseViewModel.fetchCategoryDisease()
+     diseaseViewModel.fetchDisease()
+     roomViewModel.fetchRoom()
+ }
+    if (physicianId != null) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Spacer(modifier = Modifier.height(20.dp))
 
-        BottomNavBar()
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 16.dp)
+            ) {
+                item {
+                    Spacer(modifier = Modifier.height(20.dp))
+                    HeaderSection()
+                    Spacer(modifier = Modifier.height(16.dp))
+                    NotificationCard()
+                    Spacer(modifier = Modifier.height(16.dp))
+                    GridButtons(navController)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Lịch khám trong ngày",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+
+                items(3) {
+                    AppointmentItem(name = "Ổn Dĩ Phạm", age = "20", time = "9:00 AM - 9:30 AM")
+                }
+
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Lịch trực ca đêm:",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row {
+                        ShiftChip(day = "T2")
+                        ShiftChip(day = "T4")
+                        ShiftChip(day = "T5")
+                        ShiftChip(day = "T7")
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+            }
+
+            BottomNavBar()
+        }
     }
 }
 
 
+
 @Composable
-fun GridButtons() {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+fun GridButtons(navController: NavController) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Row(
             horizontalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier.fillMaxWidth()
         ) {
-            HomeButton(icon = R.drawable.list, label = "Lịch khám")
-            HomeButton(icon = R.drawable.camera, label = "Chẩn đoán")
-            HomeButton(icon = R.drawable.resultt, label = "Tiêm chủng")
-            HomeButton(icon = R.drawable.note, label = "Chuyên viên")
+            HomeButton(icon = R.drawable.list, label = "Lịch khám") {
+                navController.navigate("appointment-list")
+            }
+            HomeButton(icon = R.drawable.camera, label = "Chẩn đoán") {
+                navController.navigate("diagnosis")
+            }
+            HomeButton(icon = R.drawable.resultt, label = "Tiêm chủng") {
+                navController.navigate("vaccination")
+            }
+            HomeButton(icon = R.drawable.note, label = "Chuyên viên") {
+                navController.navigate("specialist")
+            }
         }
         Spacer(modifier = Modifier.height(12.dp))
         Row(
             horizontalArrangement = Arrangement.SpaceEvenly,
             modifier = Modifier.fillMaxWidth()
         ) {
-            HomeButton(icon = R.drawable.list, label = "Danh sách")
-            HomeButton(icon = R.drawable.note, label = "Tra cứu y tế")
-            HomeButton(icon = R.drawable.setting, label = "Cài đặt")
+            HomeButton(icon = R.drawable.list, label = "Danh sách") {
+                navController.navigate("patient-list")
+            }
+            HomeButton(icon = R.drawable.note, label = "Tra cứu y tế") {
+                navController.navigate("medical-lookup")
+            }
+            HomeButton(icon = R.drawable.setting, label = "Cài đặt") {
+                navController.navigate("settings")
+            }
             Spacer(modifier = Modifier.width(72.dp)) // dư 1 chỗ
         }
     }
 }
-
 @Composable
-fun HomeButton(icon: Int, label: String) {
+fun HomeButton(icon: Int, label: String, onClick: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .wrapContentSize()
-            .clickable { }
+            .clickable { onClick() }
     ) {
         Card(
             shape = CircleShape,

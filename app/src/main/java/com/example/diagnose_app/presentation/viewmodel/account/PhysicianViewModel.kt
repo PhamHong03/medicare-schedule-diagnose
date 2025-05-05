@@ -102,7 +102,7 @@ class PhysicianViewModel @Inject constructor(
                     specialization_id = specialization_id
                 )
                 physicianRepository.insertPhysician(physicianEntity)
-
+                Log.d("InsertPhysician", "Chèn bác sĩ với thông tin: $physicianEntity")
                 Log.d("InsertPhysician", "Nhập thông tin thành công")
 
                 _isSaved.value = true  // Cập nhật trạng thái khi lưu thành công

@@ -1,5 +1,7 @@
 package com.example.diagnose_app.presentation.view.patients
 
+import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -26,6 +28,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -34,24 +38,70 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.example.diagnose_app.R
+import com.example.diagnose_app.presentation.viewmodel.account.AuthViewModel
+import com.example.diagnose_app.presentation.viewmodel.account.PatientViewModel
+import com.example.diagnose_app.presentation.viewmodel.account.RoomViewModel
 import com.example.diagnose_app.utils.BottomNavBar
 import com.example.diagnose_app.utils.ButtonClick
 import com.example.diagnose_app.utils.HeaderSection
 import com.example.diagnose_app.utils.NotificationCard
+import kotlinx.coroutines.delay
 
 @Composable
-fun PatientHomePage(){
+fun PatientHomePage(
+    navController: NavController,
+    patientViewModel: PatientViewModel,
+    authViewModel: AuthViewModel,
+    roomViewModel: RoomViewModel
+){
     // State để điều khiển việc hiển thị BookingScreen
     var isBookingSelected by remember { mutableStateOf(false) }
+    val currentUser by authViewModel.account.collectAsState()
+    val patientId by patientViewModel.patientId.collectAsState()
 
-    // Column của trang chính
+    val context = LocalContext.current
+    val accountId by authViewModel.account.collectAsState()
+
+
+    LaunchedEffect(accountId, patientId) {
+        accountId?.id?.let { id ->
+            patientViewModel.fetchPatientIdByAccountId(id)
+        }
+
+        delay(300) // Có thể thay bằng flag ViewModel nếu có
+
+        if (patientId == null) {
+            navController.navigate("info-patient") {
+                popUpTo("home-patient") { inclusive = true }
+            }
+        }
+    }
+//    LaunchedEffect(accountId) {
+//        if (accountId != 0) {
+//            patientViewModel.fetchPatientIdByAccountId(accountId)
+//        }
+//    }
+//
+//    LaunchedEffect(patientId) {
+//        if (accountId != 0 && patientId == null) {
+//            navController.navigate("info_patient")
+//        }
+//    }
+
+
+    LaunchedEffect(Unit) {
+        roomViewModel.fetchRoom()
+    }
+
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -253,10 +303,4 @@ fun HomeButton(icon: Int, label: String, onClick: () -> Unit) {
             modifier = Modifier.width(72.dp)
         )
     }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun DoctorHomePagePreview() {
-    PatientHomePage()
 }

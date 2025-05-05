@@ -1,4 +1,4 @@
-package com.example.diagnose_app.presentation.view.doctors
+package com.example.diagnose_app.presentation.view.patients
 
 import android.app.DatePickerDialog
 import android.content.Context
@@ -23,6 +23,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.diagnose_app.presentation.viewmodel.account.AuthViewModel
 import com.example.diagnose_app.presentation.viewmodel.account.EducationViewModel
+import com.example.diagnose_app.presentation.viewmodel.account.PatientViewModel
 import com.example.diagnose_app.presentation.viewmodel.account.PhysicianViewModel
 import com.example.diagnose_app.presentation.viewmodel.account.SpecializationViewModel
 import com.example.diagnose_app.utils.ConfirmSaveDialog
@@ -30,37 +31,19 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun InfoDoctor(
+fun InfoPatient(
     navController: NavController,
-    physicianViewModel: PhysicianViewModel,
-    specializationViewModel: SpecializationViewModel,
-    educationViewModel: EducationViewModel,
+    patientViewModel: PatientViewModel,
     authViewModel: AuthViewModel
 ) {
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("a@gmail.com") }
     var gender by remember { mutableStateOf("") }
-    var birthDate by remember { mutableStateOf("") }
+    var day_of_birth by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var address by remember { mutableStateOf("") }
+    var job by remember { mutableStateOf("") }
     var isChecked by remember { mutableStateOf(false) }
-    var specialization_id by remember { mutableStateOf(0) }
-    var education_id by remember { mutableStateOf(0) }
-
-
-
-    LaunchedEffect(Unit) {
-        specializationViewModel.fetchSpecializations()
-        educationViewModel.fetchEducations()
-    }
-    val specializations by specializationViewModel.specializationList.collectAsState()
-    val educations by educationViewModel.educationList.collectAsState()
-
-    Log.d("Debug", "Specialization List: $specializations")
-    Log.d("Debug", "Education List: $educations")
-    val specializationOptions = specializations.map { it.id to it.name }
-    val educationOptions = educations.map { it.id to it.name }
-
 
     val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
@@ -71,7 +54,7 @@ fun InfoDoctor(
     var isProcessing by remember { mutableStateOf(false) }
     LaunchedEffect (accountId){
         if(accountId != 0){
-            physicianViewModel.fetchPhysicianByAccountId(accountId)
+            patientViewModel.fetchPatientIdByAccountId(accountId)
         }
     }
 
@@ -102,15 +85,19 @@ fun InfoDoctor(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        CustomerInput(label = "Giới tính", value = gender, onValueChange = { gender = it })
+        CustomerInput(
+            label = "Giới tính",
+            value = gender,
+            onValueChange = { gender = it }
+        )
 
         Spacer(modifier = Modifier.height(10.dp))
 
         DatePickerFieldCustomer(
             context = context,
             label = "Chọn ngày sinh",
-            date = birthDate,
-            onDateSelected = { birthDate = it }
+            date = day_of_birth,
+            onDateSelected = { day_of_birth = it }
         )
 
         Spacer(modifier = Modifier.height(10.dp))
@@ -120,28 +107,22 @@ fun InfoDoctor(
             value = phone,
             onValueChange = { phone = it }
         )
-
         Spacer(modifier = Modifier.height(10.dp))
-        CustomerInput(label = "Địa chỉ", value = address, onValueChange = { address = it })
 
-        Spacer(modifier = Modifier.height(10.dp))
-        DoctorDropdownField(
-            label = "Trình độ học vấn",
-            selectedId = education_id,
-            onValueChange = { selectedId -> education_id = selectedId },
-            options = educationOptions
+        CustomerInput(
+            label = "Nghề nghiệp",
+            value = job,
+            onValueChange = { job = it }
         )
-        Spacer(modifier = Modifier.height(10.dp))
-        DoctorDropdownField(
-            label = "Chuyên môn",
-            selectedId = specialization_id,
-            onValueChange = { selectedId ->
-                specialization_id = selectedId
-                Log.d("Debug", "Selected specializationId: $selectedId")
-            },
-            options = specializationOptions
 
+        Spacer(modifier = Modifier.height(10.dp))
+        CustomerInput(
+            label = "Địa chỉ",
+            value = address,
+            onValueChange = { address = it }
         )
+
+
         Spacer(modifier = Modifier.height(10.dp))
 
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -172,34 +153,32 @@ fun InfoDoctor(
         ConfirmSaveDialog(
             onDismiss = { showDialog = false },
             onConfirm = {
-
-                Toast.makeText(context, "Chuyên môn: $specialization_id, Học vấn: $education_id", Toast.LENGTH_SHORT).show()
-                physicianViewModel.insertPhysician(
+                patientViewModel.insertPatient(
                     account_id = accountId,
                     name = name,
-                    email = email,
-                    phone = phone,
-                    address = address,
+                    day_of_birth = day_of_birth,
                     gender = gender,
-                    education_id = education_id,
-                    specialization_id = specialization_id
+                    phone = phone,
+                    email = email,
+                    job = job,
+                    address = address
                 )
                 showDialog = false
             }
         )
     }
 
-    val isSaved by physicianViewModel.isSaved.collectAsState()
+    val isSaved by patientViewModel.isSaved.collectAsState()
 
     LaunchedEffect(isSaved) {
         if (isSaved) {
             isProcessing = false
             showDialog = false
-            Toast.makeText(context, "Đăng ký bác sĩ thành công!", Toast.LENGTH_SHORT).show()
-            navController.navigate("home-doctor") {
-                popUpTo("info-doctor") { inclusive = true }
+            Toast.makeText(context, "Đăng ký hồ sơ thành công!", Toast.LENGTH_SHORT).show()
+            navController.navigate("home-patient") {
+                popUpTo("info-patient") { inclusive = true }
             }
-            physicianViewModel.resetIsSaved()
+            patientViewModel.resetIsSaved()
         }
     }
 

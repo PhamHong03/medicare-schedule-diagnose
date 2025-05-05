@@ -11,9 +11,13 @@ import com.example.diagnose_app.presentation.view.Login
 import com.example.diagnose_app.presentation.view.Register
 import com.example.diagnose_app.presentation.view.doctors.DoctorHomePage
 import com.example.diagnose_app.presentation.view.doctors.InfoDoctor
+import com.example.diagnose_app.presentation.view.patients.InfoPatient
 import com.example.diagnose_app.presentation.view.patients.PatientHomePage
 import com.example.diagnose_app.presentation.viewmodel.account.AuthViewModel
+import com.example.diagnose_app.presentation.viewmodel.account.CategoryDiseaseViewModel
+import com.example.diagnose_app.presentation.viewmodel.account.DiseaseViewModel
 import com.example.diagnose_app.presentation.viewmodel.account.EducationViewModel
+import com.example.diagnose_app.presentation.viewmodel.account.PatientViewModel
 import com.example.diagnose_app.presentation.viewmodel.account.PhysicianViewModel
 import com.example.diagnose_app.presentation.viewmodel.account.RoomViewModel
 import com.example.diagnose_app.presentation.viewmodel.account.SpecializationViewModel
@@ -24,8 +28,11 @@ fun AppNavigation(modifier: Modifier = Modifier) {
     val authViewModel: AuthViewModel = viewModel()
     val specializationViewModel: SpecializationViewModel = viewModel()
     val educationViewModel: EducationViewModel = viewModel()
-    val room: RoomViewModel = viewModel()
+    val roomViewModel: RoomViewModel = viewModel()
     val physicianViewModel: PhysicianViewModel = viewModel()
+    val patientViewModel: PatientViewModel = viewModel()
+    val categoryDiseaseViewModel: CategoryDiseaseViewModel = viewModel()
+    val diseaseViewModel: DiseaseViewModel = viewModel()
     NavHost(navController = navController, startDestination = "login") {
         composable(route = "login") {
             Login(navController, authViewModel)
@@ -38,7 +45,13 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             )
         }
         composable(route = "home-doctor") {
-            DoctorHomePage()
+            DoctorHomePage(
+                authViewModel,
+                navController, physicianViewModel,
+                categoryDiseaseViewModel = categoryDiseaseViewModel,
+                diseaseViewModel = diseaseViewModel,
+                roomViewModel = roomViewModel
+            )
         }
 
         composable(route = "info-doctor") {
@@ -52,7 +65,20 @@ fun AppNavigation(modifier: Modifier = Modifier) {
         }
 
         composable(route = "home-patient") {
-            PatientHomePage()
+            PatientHomePage(
+                navController = navController,
+                patientViewModel = patientViewModel,
+                authViewModel = authViewModel,
+                roomViewModel =  roomViewModel
+            )
+        }
+
+        composable(route = "info-patient") {
+            InfoPatient(
+                navController = navController,
+                patientViewModel = patientViewModel,
+                authViewModel = authViewModel
+            )
         }
 
     }
