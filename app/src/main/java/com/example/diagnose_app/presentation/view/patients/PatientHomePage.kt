@@ -170,7 +170,9 @@ fun PatientHomePage(
             onSelectedPhysician = {id->
                 selectedPhysicianId = id
                 Log.d("Physician", "Selected ID: $id")
+                navController.navigate("calendarExam")
             }
+
         )
     }
 }
@@ -216,7 +218,9 @@ fun AppointmentSection() {
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     ButtonClick(
-                        onClick = {},
+                        onClick = {
+
+                        },
                         text = "Huỷ lịch",
                         modifier = Modifier
                             .weight(1f)

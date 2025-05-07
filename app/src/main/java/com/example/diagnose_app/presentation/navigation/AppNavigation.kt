@@ -14,6 +14,8 @@ import com.example.diagnose_app.presentation.view.doctors.DoctorHomePage
 import com.example.diagnose_app.presentation.view.doctors.Examinate
 import com.example.diagnose_app.presentation.view.doctors.InfoDoctor
 import com.example.diagnose_app.presentation.view.doctors.PatientList
+import com.example.diagnose_app.presentation.view.patients.AppointmentCard
+import com.example.diagnose_app.presentation.view.patients.CalendarExam
 import com.example.diagnose_app.presentation.view.patients.InfoPatient
 import com.example.diagnose_app.presentation.view.patients.PatientHomePage
 import com.example.diagnose_app.presentation.viewmodel.account.AuthViewModel
@@ -104,5 +106,15 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             )
         }
 
+        composable("calendarExam") {
+            CalendarExam(
+                onNextClicked = {
+                    navController.navigate("result-booking")
+                }
+            )
+        }
+        composable("result-booking") {
+            AppointmentCard()
+        }
     }
 }

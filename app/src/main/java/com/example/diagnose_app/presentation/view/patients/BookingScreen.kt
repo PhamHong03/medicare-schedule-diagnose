@@ -143,6 +143,7 @@ fun PhysicianListScreen(
                             .clickable {
                                 onSelectedPhysician(physician.id)
                                 onDismiss()
+
                             }
                     ) {
                         Row(
