@@ -29,6 +29,13 @@ interface PhysicianApiService {
     @GET("physicians/account/{account_id}")
     suspend fun getPhysicianByAccountId(@Path("account_id") acocuntId: Int): PhysicianEntity?
 
+    @GET("physicians/by_specialization/{specialization_id}")
+    suspend fun getPhysiciansBySpecialization(
+        @Path("specialization_id") specializationId: Int
+    ): List<PhysicianEntity>
+
+
+
 //    @GET("physician/{physician_id}/patients")
 //    suspend fun getPatientsByPhysician(@Path("physician_id") physicianId: Int): List<PatientWithApplicationDate>
 

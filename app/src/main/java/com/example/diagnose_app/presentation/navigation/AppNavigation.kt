@@ -9,8 +9,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.diagnose_app.presentation.view.Login
 import com.example.diagnose_app.presentation.view.Register
+import com.example.diagnose_app.presentation.view.doctors.Diagnose
 import com.example.diagnose_app.presentation.view.doctors.DoctorHomePage
+import com.example.diagnose_app.presentation.view.doctors.Examinate
 import com.example.diagnose_app.presentation.view.doctors.InfoDoctor
+import com.example.diagnose_app.presentation.view.doctors.PatientList
 import com.example.diagnose_app.presentation.view.patients.InfoPatient
 import com.example.diagnose_app.presentation.view.patients.PatientHomePage
 import com.example.diagnose_app.presentation.viewmodel.account.AuthViewModel
@@ -64,12 +67,32 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             )
         }
 
+        composable(route = "appointment-list") {
+            PatientList(
+                navController = navController,
+                patientViewModel = patientViewModel
+            )
+        }
+
+        composable(route = "examinate") {
+            Examinate(navController)
+        }
+
+
+        composable("diagnose") {
+            Diagnose(navController = navController)
+        }
+
+
+
+
         composable(route = "home-patient") {
             PatientHomePage(
                 navController = navController,
                 patientViewModel = patientViewModel,
                 authViewModel = authViewModel,
-                roomViewModel =  roomViewModel
+                roomViewModel =  roomViewModel,
+                specializationViewModel = specializationViewModel
             )
         }
 

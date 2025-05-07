@@ -54,7 +54,15 @@ class PhysicianViewModel @Inject constructor(
 //        }
 //    }
 
+    private val _physiciansBySpecialization = MutableStateFlow<List<PhysicianEntity>>(emptyList())
+    val physiciansBySpecialization: StateFlow<List<PhysicianEntity>> = _physiciansBySpecialization
 
+    fun getPhysiciansBySpecialization(specializationId: Int) {
+        viewModelScope.launch {
+            val result = physicianRepository.getPhysiciansBySpecialization(specializationId)
+            _physiciansBySpecialization.value = result
+        }
+    }
 
     fun fetchPhysicianByAccountId(accountId: Int) {
         viewModelScope.launch {
@@ -80,6 +88,8 @@ class PhysicianViewModel @Inject constructor(
     suspend fun isDoctorExists(accountId: Int): Boolean {
         return physicianRepository.checkPhysicianExists(accountId)
     }
+
+
     fun fetchPhysician(){
         viewModelScope.launch {
             _isLoading.value = true

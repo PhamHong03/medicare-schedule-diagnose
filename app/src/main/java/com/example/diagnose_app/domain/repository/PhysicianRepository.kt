@@ -17,6 +17,8 @@ interface PhysicianRepository {
 
     suspend fun checkPhysicianExists(accountId: Int): Boolean
 
+
+    suspend fun getPhysiciansBySpecialization(specializationId: Int): List<PhysicianEntity>
 //    suspend fun getPatientsByPhysician(accountId: Int): List<PatientWithApplicationDate>
 
 }

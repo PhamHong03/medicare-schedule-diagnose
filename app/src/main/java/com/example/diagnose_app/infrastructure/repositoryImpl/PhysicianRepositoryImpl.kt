@@ -82,6 +82,10 @@ class PhysicianRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun getPhysiciansBySpecialization(specializationId: Int): List<PhysicianEntity> {
+        return physicianApiService.getPhysiciansBySpecialization(specializationId)
+    }
+
 //    override suspend fun getPatientsByPhysician(accountId: Int): List<PatientWithApplicationDate> {
 //        return physicianApiService.getPatientsByPhysician(accountId)
 //    }

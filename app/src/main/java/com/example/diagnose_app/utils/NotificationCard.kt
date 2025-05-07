@@ -30,13 +30,13 @@ fun NotificationCard() {
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = "Thông báo nghỉ lễ 30/4",
+                    text = "Thông báo nghỉ lễ 2/9",
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Lịch nghỉ từ 30/4 đến 1/5",
+                    text = "Lịch nghỉ từ 2/9 đến 3/9",
                     fontSize = 14.sp
                 )
             }

@@ -50,6 +50,7 @@ import com.example.diagnose_app.R
 import com.example.diagnose_app.presentation.viewmodel.account.AuthViewModel
 import com.example.diagnose_app.presentation.viewmodel.account.PatientViewModel
 import com.example.diagnose_app.presentation.viewmodel.account.RoomViewModel
+import com.example.diagnose_app.presentation.viewmodel.account.SpecializationViewModel
 import com.example.diagnose_app.utils.BottomNavBar
 import com.example.diagnose_app.utils.ButtonClick
 import com.example.diagnose_app.utils.HeaderSection
@@ -61,7 +62,9 @@ fun PatientHomePage(
     navController: NavController,
     patientViewModel: PatientViewModel,
     authViewModel: AuthViewModel,
-    roomViewModel: RoomViewModel
+    roomViewModel: RoomViewModel,
+    specializationViewModel: SpecializationViewModel,
+
 ){
     // State để điều khiển việc hiển thị BookingScreen
     var isBookingSelected by remember { mutableStateOf(false) }
@@ -70,7 +73,9 @@ fun PatientHomePage(
 
     val context = LocalContext.current
     val accountId by authViewModel.account.collectAsState()
-
+    var selectedSpecializationId by remember { mutableStateOf<Int?>(null) }
+    var selectedSpecializationName by remember { mutableStateOf<String?>(null) }
+    var selectedPhysicianId by remember { mutableStateOf<Int?>(null) }
 
     LaunchedEffect(accountId, patientId) {
         accountId?.id?.let { id ->
@@ -141,10 +146,32 @@ fun PatientHomePage(
             ) {
                 // Hiển thị BookingScreen
                 BookingScreen(
-                    onDismiss = { isBookingSelected = false } // Callback để đóng màn hình BookingScreen
+                    onDismiss = { isBookingSelected = false } ,
+                    specializationViewModel = specializationViewModel,
+                    onSpecializationSelected = { id ->
+                        selectedSpecializationId = id
+                        selectedSpecializationName = specializationViewModel.getNameById(id)
+                        Log.d("Specialization", "Selected ID: $id")
+                    }
                 )
             }
         }
+    }
+
+    if (selectedSpecializationId != null && selectedSpecializationName != null) {
+        PhysicianListScreen(
+            specializationId = selectedSpecializationId!!,
+            specializationName = selectedSpecializationName!!,
+            onDismiss = {
+                selectedSpecializationId = null
+                selectedSpecializationName = null
+            },
+            specializationViewModel = specializationViewModel,
+            onSelectedPhysician = {id->
+                selectedPhysicianId = id
+                Log.d("Physician", "Selected ID: $id")
+            }
+        )
     }
 }
 

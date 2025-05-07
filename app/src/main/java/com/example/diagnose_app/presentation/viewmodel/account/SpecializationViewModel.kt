@@ -34,4 +34,8 @@ class SpecializationViewModel @Inject constructor(
     fun getAllSpecialization(){
         fetchSpecializations()
     }
+
+    fun getNameById(id: Int): String? {
+        return specializationList.value.find { it.id == id }?.name
+    }
 }

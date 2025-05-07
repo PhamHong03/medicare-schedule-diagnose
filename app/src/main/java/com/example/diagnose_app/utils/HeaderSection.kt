@@ -41,7 +41,7 @@ fun HeaderSection() {
             Column {
                 Text(text = "Chào buổi sáng 👋", fontSize = 14.sp)
                 Text(
-                    text = "Apple Dot",
+                    text = "Cam HJong",
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold
                 )
