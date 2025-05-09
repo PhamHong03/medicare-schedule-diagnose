@@ -103,7 +103,7 @@ fun BookingScreen(
 @Composable
 fun PhysicianListScreen(
     specializationId: Int,
-    specializationName: String,
+//    specializationName: String,
     onDismiss: () -> Unit,
     physicianViewModel: PhysicianViewModel = hiltViewModel() ,
     specializationViewModel: SpecializationViewModel,

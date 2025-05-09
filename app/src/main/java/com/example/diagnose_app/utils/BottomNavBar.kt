@@ -11,10 +11,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.font.FontWeight
+import androidx.navigation.NavController
 import com.example.diagnose_app.R
 
 @Composable
-fun BottomNavBar() {
+fun BottomNavBar(
+    navController: NavController
+) {
     var selectedItem by remember { mutableStateOf(0) }
 
     NavigationBar(
@@ -23,16 +26,19 @@ fun BottomNavBar() {
         modifier = Modifier
     ) {
         val items = listOf(
-            NavItem(label = "Trang chủ", image = R.drawable.camera),
-            NavItem(label = "Lịch khám", image = R.drawable.note),
-            NavItem(label = "Lịch sử", image = R.drawable.resultt),
-            NavItem(label = "Cài đặt", image = R.drawable.bell)
+            NavItem(label = "Trang chủ", image = R.drawable.camera, route = ""),
+            NavItem(label = "Lịch khám", image = R.drawable.note, route = "appointment-list"),
+            NavItem(label = "Lịch sử", image = R.drawable.resultt, route = ""),
+            NavItem(label = "Cài đặt", image = R.drawable.bell, route = "setting-profile")
         )
 
         items.forEachIndexed { index, item ->
             NavigationBarItem(
                 selected = selectedItem == index,
-                onClick = { selectedItem = index },
+                onClick = {
+                    selectedItem = index
+                    navController.navigate(item.route)
+                          },
                 icon = {
                     Image(
                         painter = painterResource(id = item.image),
@@ -54,4 +60,4 @@ fun BottomNavBar() {
     }
 }
 
-data class NavItem(val label: String, val image: Int)
+data class NavItem(val label: String, val image: Int, val route: String)

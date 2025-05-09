@@ -119,11 +119,12 @@ fun Examinate(navController: NavController) {
 
                 Button(
                     onClick = {
-                        navController.navigate("diagnose")
+                        navController.navigate("upload_images")
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
+                    shape = RoundedCornerShape(8.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF90CAF9))
                 ) {
                     Text(

@@ -14,6 +14,8 @@ import com.example.diagnose_app.presentation.view.doctors.DoctorHomePage
 import com.example.diagnose_app.presentation.view.doctors.Examinate
 import com.example.diagnose_app.presentation.view.doctors.InfoDoctor
 import com.example.diagnose_app.presentation.view.doctors.PatientList
+import com.example.diagnose_app.presentation.view.doctors.SettingProfile
+import com.example.diagnose_app.presentation.view.doctors.UploadImages
 import com.example.diagnose_app.presentation.view.patients.AppointmentCard
 import com.example.diagnose_app.presentation.view.patients.CalendarExam
 import com.example.diagnose_app.presentation.view.patients.InfoPatient
@@ -80,11 +82,18 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             Examinate(navController)
         }
 
+        composable("upload_images") {
+            UploadImages(navController = navController)
+        }
+
 
         composable("diagnose") {
             Diagnose(navController = navController)
         }
 
+        composable("setting-profile") {
+            SettingProfile()
+        }
 
 
 
@@ -106,11 +115,15 @@ fun AppNavigation(modifier: Modifier = Modifier) {
             )
         }
 
-        composable("calendarExam") {
+        composable("calendarExam/{selectedSpecializationId}") {backStackEntry->
+            val selectedSpecializationId = backStackEntry.arguments?.getString("selectedSpecializationId")?.toIntOrNull()
             CalendarExam(
                 onNextClicked = {
                     navController.navigate("result-booking")
-                }
+                },
+                specializationViewModel = specializationViewModel,
+                selectedSpecializationId = selectedSpecializationId,
+                navController = navController
             )
         }
         composable("result-booking") {

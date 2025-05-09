@@ -161,6 +161,6 @@ fun PatientList(
             }
         }
 
-        BottomNavBar()
+        BottomNavBar(navController = navController)
     }
 }

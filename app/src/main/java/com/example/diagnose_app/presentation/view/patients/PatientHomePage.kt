@@ -132,7 +132,7 @@ fun PatientHomePage(
         }
 
         // BottomNavBar luôn hiển thị phía dưới màn hình
-        BottomNavBar()
+        BottomNavBar(navController = navController)
     }
 
     // Khi isBookingSelected là true, hiển thị BookingScreen với background mờ
@@ -151,6 +151,7 @@ fun PatientHomePage(
                     onSpecializationSelected = { id ->
                         selectedSpecializationId = id
                         selectedSpecializationName = specializationViewModel.getNameById(id)
+                        navController.navigate("calendarExam/$selectedSpecializationId")
                         Log.d("Specialization", "Selected ID: $id")
                     }
                 )
@@ -158,23 +159,22 @@ fun PatientHomePage(
         }
     }
 
-    if (selectedSpecializationId != null && selectedSpecializationName != null) {
-        PhysicianListScreen(
-            specializationId = selectedSpecializationId!!,
-            specializationName = selectedSpecializationName!!,
-            onDismiss = {
-                selectedSpecializationId = null
-                selectedSpecializationName = null
-            },
-            specializationViewModel = specializationViewModel,
-            onSelectedPhysician = {id->
-                selectedPhysicianId = id
-                Log.d("Physician", "Selected ID: $id")
-                navController.navigate("calendarExam")
-            }
-
-        )
-    }
+//    if (selectedSpecializationId != null && selectedSpecializationName != null) {
+//        PhysicianListScreen(
+//            specializationId = selectedSpecializationId!!,
+//            specializationName = selectedSpecializationName!!,
+//            onDismiss = {
+//                selectedSpecializationId = null
+//                selectedSpecializationName = null
+//            },
+//            specializationViewModel = specializationViewModel,
+//            onSelectedPhysician = {id->
+//                selectedPhysicianId = id
+//                Log.d("Physician", "Selected ID: $id")
+//                navController.navigate("calendarExam")
+//            }
+//        )
+//    }
 }
 
 @Composable

@@ -110,7 +110,7 @@ fun DoctorHomePage(
                 }
             }
 
-            BottomNavBar()
+            BottomNavBar(navController = navController)
         }
     }
 }
